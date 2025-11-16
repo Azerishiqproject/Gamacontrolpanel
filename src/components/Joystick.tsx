@@ -107,19 +107,20 @@ export default function Joystick({ onMove, size, label, disabled = false }: Joys
       >
         {/* Dış çember - gölge efekti */}
         <div
-          className="absolute rounded-full bg-[#141414] shadow-inner"
+          className="absolute rounded-full bg-white/60 backdrop-blur-lg shadow-inner border border-white/80"
           style={{
             width: size,
             height: size,
             top: 0,
             left: 0,
-            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
+            backdropFilter: 'blur(10px) saturate(180%)',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
           }}
         />
         
         {/* İç çember - hafif border */}
         <div
-          className="absolute rounded-full border border-[#1A1A1A]"
+          className="absolute rounded-full border border-white/90"
           style={{
             width: size - 4,
             height: size - 4,
@@ -140,7 +141,7 @@ export default function Joystick({ onMove, size, label, disabled = false }: Joys
             y1={0}
             x2={size / 2}
             y2={size}
-            stroke="rgba(255,255,255,0.4)"
+            stroke="rgba(0,0,0,0.2)"
             strokeWidth="1.5"
           />
           <line
@@ -148,7 +149,7 @@ export default function Joystick({ onMove, size, label, disabled = false }: Joys
             y1={size / 2}
             x2={size}
             y2={size / 2}
-            stroke="rgba(255,255,255,0.4)"
+            stroke="rgba(0,0,0,0.2)"
             strokeWidth="1.5"
           />
         </svg>
@@ -181,7 +182,7 @@ export default function Joystick({ onMove, size, label, disabled = false }: Joys
           }}
         />
       </div>
-      {label && <span className="text-[10px] text-gray-400 font-medium">{label}</span>}
+      {label && <span className="text-[10px] text-gray-700 font-medium">{label}</span>}
     </div>
   );
 }

@@ -4,16 +4,22 @@ import { useState, useEffect, useRef } from 'react';
 import { 
   FaVideo,
   FaThermometerHalf,
-  FaBatteryFull
+  FaBatteryFull,
+  FaChevronLeft,
+  FaChevronRight,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaTimesCircle,
+  FaInfoCircle
 } from 'react-icons/fa';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { 
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import Compass from './Compass';
 
 interface LogEntry {
   time: string;
@@ -21,7 +27,12 @@ interface LogEntry {
   type: 'success' | 'warning' | 'error' | 'info';
 }
 
-export default function RightPanel() {
+interface RightPanelProps {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
+export default function RightPanel({ isCollapsed, onToggleCollapse }: RightPanelProps) {
   const [logs, setLogs] = useState<LogEntry[]>([
     { time: '14:32:10', message: 'Takeoff initiated', type: 'success' },
     { time: '14:33:05', message: 'Low battery warning (20%)', type: 'warning' },
@@ -55,128 +66,232 @@ export default function RightPanel() {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
+  const getLogIcon = (type: LogEntry['type']) => {
+    switch (type) {
+      case 'success':
+        return <FaCheckCircle className="text-green-600 text-xs" />;
+      case 'warning':
+        return <FaExclamationTriangle className="text-yellow-600 text-xs" />;
+      case 'error':
+        return <FaTimesCircle className="text-red-600 text-xs" />;
+      default:
+        return <FaInfoCircle className="text-blue-600 text-xs" />;
+    }
+  };
+
   const getLogColor = (type: LogEntry['type']) => {
     switch (type) {
       case 'success':
-        return 'text-green-400';
+        return 'text-green-800';
       case 'warning':
-        return 'text-yellow-400';
+        return 'text-yellow-800';
       case 'error':
-        return 'text-red-400';
+        return 'text-red-800';
       default:
-        return 'text-gray-300';
+        return 'text-gray-800';
     }
   };
 
   const getLogBgColor = (type: LogEntry['type']) => {
     switch (type) {
       case 'success':
-        return 'bg-green-500/10 border-green-500/20';
+        return 'bg-green-500/20 backdrop-blur-md border-green-500/40';
       case 'warning':
-        return 'bg-yellow-500/10 border-yellow-500/20';
+        return 'bg-yellow-500/20 backdrop-blur-md border-yellow-500/40';
       case 'error':
-        return 'bg-red-500/10 border-red-500/20';
+        return 'bg-red-500/20 backdrop-blur-md border-red-500/40';
       default:
-        return 'bg-gray-500/10 border-gray-500/20';
+        return 'bg-blue-500/20 backdrop-blur-md border-blue-500/40';
     }
   };
 
   return (
-    <aside className="w-[280px] bg-[#141414] border-l border-[#1A1A1A] flex flex-col overflow-hidden hidden lg:flex">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <aside 
+      className={`bg-white/40 backdrop-blur-xl border-l border-white/70 transition-all duration-300 flex flex-col overflow-hidden hidden lg:flex shadow-2xl ${
+        isCollapsed ? 'w-[48px]' : 'w-[280px]'
+      }`}
+      style={{ 
+        boxShadow: '-4px 0 24px 0 rgba(31, 38, 135, 0.25), inset 1px 0 0 rgba(255, 255, 255, 0.5)',
+        backdropFilter: 'blur(12px) saturate(180%)',
+      }}
+    >
+      {/* Collapse Button */}
+      <div className="p-1 border-b border-white/30 flex justify-end">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onToggleCollapse}
+          className="h-7 w-7 text-gray-700 hover:text-gray-900 hover:bg-white/60 bg-white/40 backdrop-blur-lg border border-white/70 shadow-lg p-0 transition-all" style={{
+            backdropFilter: 'blur(10px) saturate(180%)',
+            boxShadow: '0 2px 8px 0 rgba(31, 38, 135, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+          }}
+        >
+          {isCollapsed ? <FaChevronLeft className="text-[10px]" /> : <FaChevronRight className="text-[10px]" />}
+        </Button>
+      </div>
+
+      {!isCollapsed && (
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Sensör Verileri */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
             Sensor Data
           </h3>
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="camera" className="border-[#1A1A1A]">
-              <AccordionTrigger className="text-sm text-white hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <FaVideo className="text-[#007BFF]" />
-                  <span>Camera Status</span>
+          <Accordion type="single" collapsible className="w-full space-y-2">
+            <AccordionItem value="camera" className="border-white/70 bg-white/50 backdrop-blur-lg rounded-lg shadow-xl" style={{ 
+              boxShadow: '0 2px 8px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+              backdropFilter: 'blur(10px) saturate(180%)',
+            }}>
+              <AccordionTrigger className="text-sm text-gray-800 hover:no-underline py-3 px-4 hover:bg-white/30 rounded-lg transition-colors">
+                <div className="flex items-center gap-3 flex-1">
+                  <FaVideo className="text-blue-600 text-base" />
+                  <span className="font-medium">Camera Status</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="text-xs text-gray-300 space-y-1">
-                <div>Resolution: 1920x1080</div>
-                <div>FPS: 30</div>
-                <div>Zoom: 1x</div>
-                <div>Recording: Active</div>
+              <AccordionContent className="text-xs text-gray-700 space-y-1.5 px-4 pb-3 pt-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Resolution:</span>
+                  <span className="font-medium text-gray-800">1920x1080</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">FPS:</span>
+                  <span className="font-medium text-gray-800">30</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Zoom:</span>
+                  <span className="font-medium text-gray-800">1x</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Recording:</span>
+                  <span className="font-medium text-green-600">Active</span>
+                </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="imu" className="border-[#1A1A1A]">
-              <AccordionTrigger className="text-sm text-white hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <FaThermometerHalf className="text-[#28A745]" />
-                  <span>IMU</span>
+            <AccordionItem value="imu" className="border-white/70 bg-white/50 backdrop-blur-lg rounded-lg shadow-xl" style={{ 
+              boxShadow: '0 2px 8px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+              backdropFilter: 'blur(10px) saturate(180%)',
+            }}>
+              <AccordionTrigger className="text-sm text-gray-800 hover:no-underline py-3 px-4 hover:bg-white/30 rounded-lg transition-colors">
+                <div className="flex items-center gap-3 flex-1">
+                  <FaThermometerHalf className="text-green-600 text-base" />
+                  <span className="font-medium">IMU</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="text-xs text-gray-300 space-y-1">
-                <div>Pitch: 2.3°</div>
-                <div>Roll: -1.5°</div>
-                <div>Yaw: 45.2°</div>
-                <div>Acceleration: 9.81 m/s²</div>
+              <AccordionContent className="text-xs text-gray-700 space-y-1.5 px-4 pb-3 pt-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Pitch:</span>
+                  <span className="font-medium text-gray-800">2.3°</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Roll:</span>
+                  <span className="font-medium text-gray-800">-1.5°</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Yaw:</span>
+                  <span className="font-medium text-gray-800">45.2°</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Acceleration:</span>
+                  <span className="font-medium text-gray-800">9.81 m/s²</span>
+                </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="battery" className="border-[#1A1A1A]">
-              <AccordionTrigger className="text-sm text-white hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <FaBatteryFull className="text-[#DC3545]" />
-                  <span>Battery Detail</span>
+            <AccordionItem value="battery" className="border-white/70 bg-white/50 backdrop-blur-lg rounded-lg shadow-xl" style={{ 
+              boxShadow: '0 2px 8px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+              backdropFilter: 'blur(10px) saturate(180%)',
+            }}>
+              <AccordionTrigger className="text-sm text-gray-800 hover:no-underline py-3 px-4 hover:bg-white/30 rounded-lg transition-colors">
+                <div className="flex items-center gap-3 flex-1">
+                  <FaBatteryFull className="text-red-600 text-base" />
+                  <span className="font-medium">Battery Detail</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="text-xs text-gray-300 space-y-1">
-                <div>Level: 75%</div>
-                <div>Voltage: 12.6V</div>
-                <div>Current: 15.2A</div>
-                <div>Temperature: 28°C</div>
+              <AccordionContent className="text-xs text-gray-700 space-y-1.5 px-4 pb-3 pt-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Level:</span>
+                  <span className="font-medium text-gray-800">75%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Voltage:</span>
+                  <span className="font-medium text-gray-800">12.6V</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Current:</span>
+                  <span className="font-medium text-gray-800">15.2A</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Temperature:</span>
+                  <span className="font-medium text-gray-800">28°C</span>
+                </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="temp" className="border-[#1A1A1A]">
-              <AccordionTrigger className="text-sm text-white hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <FaThermometerHalf className="text-orange-500" />
-                  <span>Temperature</span>
+            <AccordionItem value="temp" className="border-white/70 bg-white/50 backdrop-blur-lg rounded-lg shadow-xl" style={{ 
+              boxShadow: '0 2px 8px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+              backdropFilter: 'blur(10px) saturate(180%)',
+            }}>
+              <AccordionTrigger className="text-sm text-gray-800 hover:no-underline py-3 px-4 hover:bg-white/30 rounded-lg transition-colors">
+                <div className="flex items-center gap-3 flex-1">
+                  <FaThermometerHalf className="text-orange-600 text-base" />
+                  <span className="font-medium">Temperature</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="text-xs text-gray-300 space-y-1">
-                <div>Motor: 45°C</div>
-                <div>Battery: 28°C</div>
-                <div>Camera: 32°C</div>
-                <div>Air: 22°C</div>
+              <AccordionContent className="text-xs text-gray-700 space-y-1.5 px-4 pb-3 pt-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Motor:</span>
+                  <span className="font-medium text-gray-800">45°C</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Battery:</span>
+                  <span className="font-medium text-gray-800">28°C</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Camera:</span>
+                  <span className="font-medium text-gray-800">32°C</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Air:</span>
+                  <span className="font-medium text-gray-800">22°C</span>
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </div>
 
-        {/* Compass - Sadece pusula, daha küçük */}
-        <div className="flex flex-col items-center bg-[#0D0D0D] rounded-lg p-3 border border-[#1A1A1A]">
-          <h3 className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
-            Compass
-          </h3>
-          <Compass heading={45} size={150} />
-        </div>
-
         {/* Olay Günlüğü */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
             Event Log
           </h3>
-          <Card className="bg-[#0D0D0D] border-[#1A1A1A] p-2">
-            <div className="max-h-48 overflow-y-auto space-y-1">
+          <Card className="bg-white/30 backdrop-blur-xl border-white/60 p-3 shadow-2xl" style={{ 
+            boxShadow: '0 4px 16px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+            backdropFilter: 'blur(12px) saturate(180%)',
+          }}>
+            <div className="max-h-48 overflow-y-auto space-y-2 scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent">
               {logs.map((log, index) => (
                 <div
                   key={index}
-                  className={`p-2 rounded border text-xs ${getLogBgColor(log.type)}`}
+                  className={`p-2.5 rounded-lg border transition-all hover:scale-[1.02] ${getLogBgColor(log.type)}`}
+                  style={{
+                    boxShadow: '0 2px 8px 0 rgba(31, 38, 135, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                  }}
                 >
-                  <div className="flex items-start gap-2">
-                    <span className="text-gray-500 font-mono">{log.time}</span>
-                    <span className={`flex-1 ${getLogColor(log.type)}`}>
-                      {log.message}
-                    </span>
+                  <div className="flex items-start gap-2.5">
+                    <div className="mt-0.5 flex-shrink-0">
+                      {getLogIcon(log.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-[10px] text-gray-500 font-mono font-medium">
+                          {log.time}
+                        </span>
+                      </div>
+                      <span className={`text-xs font-medium leading-relaxed ${getLogColor(log.type)}`}>
+                        {log.message}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -184,7 +299,8 @@ export default function RightPanel() {
             </div>
           </Card>
         </div>
-      </div>
+        </div>
+      )}
     </aside>
   );
 }

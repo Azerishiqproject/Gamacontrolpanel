@@ -19,9 +19,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className="dark">
+    <html lang="tr">
       <body
-        className={`${inter.variable} font-sans antialiased bg-[#1E1E1E] text-white overflow-hidden`}
+        className={`${inter.variable} font-sans antialiased text-gray-900 overflow-hidden`}
       >
         {children}
         <Toaster />

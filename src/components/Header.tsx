@@ -32,11 +32,11 @@ interface HeaderProps {
 
 export default function Header({ isConnected, batteryLevel, signalStrength, onEmergencyStop }: HeaderProps) {
   const getBatteryIcon = () => {
-    if (batteryLevel >= 75) return <FaBatteryFull className="text-green-500" />;
-    if (batteryLevel >= 50) return <FaBatteryThreeQuarters className="text-green-400" />;
-    if (batteryLevel >= 25) return <FaBatteryHalf className="text-yellow-500" />;
-    if (batteryLevel >= 10) return <FaBatteryQuarter className="text-orange-500" />;
-    return <FaBatteryEmpty className="text-red-500" />;
+    if (batteryLevel >= 75) return <FaBatteryFull className="text-green-600" />;
+    if (batteryLevel >= 50) return <FaBatteryThreeQuarters className="text-green-500" />;
+    if (batteryLevel >= 25) return <FaBatteryHalf className="text-yellow-600" />;
+    if (batteryLevel >= 10) return <FaBatteryQuarter className="text-orange-600" />;
+    return <FaBatteryEmpty className="text-red-600" />;
   };
 
   const getBatteryColor = () => {
@@ -46,7 +46,10 @@ export default function Header({ isConnected, batteryLevel, signalStrength, onEm
   };
 
   return (
-    <header className="h-[55px] bg-[#141414] border-b border-[#1A1A1A] flex items-center justify-between px-4 md:px-6 flex-shrink-0 z-50">
+    <header className="h-[55px] bg-white/40 backdrop-blur-xl border-b border-white/70 flex items-center justify-between px-4 md:px-6 flex-shrink-0 z-50 shadow-2xl" style={{ 
+      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+      backdropFilter: 'blur(12px) saturate(180%)',
+    }}>
       {/* Sol: Logo */}
       <div className="flex items-center gap-2.5">
         <img 
@@ -54,25 +57,28 @@ export default function Header({ isConnected, batteryLevel, signalStrength, onEm
           alt="Gama Logo" 
           className="h-8 w-auto object-contain"
         />
-        <h1 className="text-sm font-semibold text-white hidden sm:block">Gama Control Panel</h1>
+        <h1 className="text-sm font-semibold text-gray-800 hidden sm:block">Gama Control Panel</h1>
       </div>
 
       {/* Orta: Bağlantı Durumu, Sinyal ve Pil */}
       <div className="flex items-center gap-3 md:gap-6">
         {/* Bağlantı Durumu */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 bg-white/50 backdrop-blur-lg px-3 py-1.5 rounded-full border border-white/80 shadow-xl" style={{
+          boxShadow: '0 4px 16px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+          backdropFilter: 'blur(10px) saturate(180%)',
+        }}>
           <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-700 font-medium">
             {isConnected ? 'Connected' : 'Disconnected'}
           </span>
         </div>
 
         {/* Sinyal Gücü */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/40">
           <FaSignal className={`text-sm ${
-            signalStrength >= 70 ? 'text-green-500' : 
-            signalStrength >= 40 ? 'text-yellow-500' : 
-            'text-red-500'
+            signalStrength >= 70 ? 'text-green-600' : 
+            signalStrength >= 40 ? 'text-yellow-600' : 
+            'text-red-600'
           }`} />
           <div className="flex items-center gap-1.5">
             <Progress 
@@ -83,23 +89,23 @@ export default function Header({ isConnected, batteryLevel, signalStrength, onEm
                 '[&>div]:bg-red-500'
               }`}
             />
-            <span className={`text-xs w-8 ${
-              signalStrength >= 70 ? 'text-green-400' : 
-              signalStrength >= 40 ? 'text-yellow-400' : 
-              'text-red-400'
+            <span className={`text-xs w-8 font-medium ${
+              signalStrength >= 70 ? 'text-green-700' : 
+              signalStrength >= 40 ? 'text-yellow-700' : 
+              'text-red-700'
             }`}>{Math.round(signalStrength)}%</span>
           </div>
         </div>
 
         {/* Pil Seviyesi */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/40">
           {getBatteryIcon()}
           <div className="flex items-center gap-1.5">
             <Progress 
               value={batteryLevel} 
               className="h-1.5 w-16"
             />
-            <span className="text-xs text-gray-400 w-8">{Math.round(batteryLevel)}%</span>
+            <span className="text-xs text-gray-700 font-medium w-8">{Math.round(batteryLevel)}%</span>
           </div>
         </div>
       </div>
@@ -109,15 +115,21 @@ export default function Header({ isConnected, batteryLevel, signalStrength, onEm
         {/* Kullanıcı Menüsü */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-700 hover:text-gray-900 hover:bg-white/60 bg-white/40 backdrop-blur-lg border border-white/70 shadow-lg transition-all" style={{
+              backdropFilter: 'blur(10px) saturate(180%)',
+              boxShadow: '0 2px 8px 0 rgba(31, 38, 135, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+            }}>
               <FaUserCircle className="text-base" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-[#141414] border-[#1A1A1A] text-white">
-            <DropdownMenuItem className="hover:bg-[#1A1A1A] cursor-pointer text-sm">
+          <DropdownMenuContent align="end" className="bg-white/60 backdrop-blur-xl border-white/80 text-gray-800 shadow-2xl" style={{ 
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+            backdropFilter: 'blur(12px) saturate(180%)',
+          }}>
+            <DropdownMenuItem className="hover:bg-white/60 cursor-pointer text-sm">
               Settings
             </DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-[#1A1A1A] cursor-pointer text-sm">
+            <DropdownMenuItem className="hover:bg-white/60 cursor-pointer text-sm">
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -126,7 +138,10 @@ export default function Header({ isConnected, batteryLevel, signalStrength, onEm
         {/* Acil Durdurma Butonu */}
         <Button
           onClick={onEmergencyStop}
-          className="bg-transparent hover:bg-red-500/20 border border-red-500/50 text-red-400 hover:text-red-300 font-semibold px-3 md:px-4 py-1.5 rounded-full flex items-center gap-1.5 transition-all text-xs"
+          className="bg-red-500/40 hover:bg-red-500/50 backdrop-blur-lg border border-red-500/70 text-red-700 hover:text-red-800 font-semibold px-3 md:px-4 py-1.5 rounded-full flex items-center gap-1.5 transition-all text-xs shadow-2xl" style={{
+            boxShadow: '0 4px 16px 0 rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(10px) saturate(180%)',
+          }}
         >
           <FaExclamationTriangle className="text-xs" />
           <span className="hidden sm:inline">EMERGENCY</span>

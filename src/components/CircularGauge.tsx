@@ -36,7 +36,7 @@ export default function CircularGauge({ value, min, max, label, color }: Circula
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="#1A1A1A"
+            stroke="rgba(0,0,0,0.1)"
             strokeWidth="6"
           />
           
@@ -56,13 +56,13 @@ export default function CircularGauge({ value, min, max, label, color }: Circula
         
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-xs font-bold text-white">
+            <div className="text-xs font-bold text-gray-800">
               {value > 0 ? '+' : ''}{value.toFixed(1)}°
             </div>
           </div>
         </div>
       </div>
-      <span className="text-[9px] text-gray-400 uppercase">{label}</span>
+      <span className="text-[9px] text-gray-700 uppercase font-medium">{label}</span>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaArrowUp, FaArrowDown, FaHome, FaExclamationTriangle, FaRobot, FaRoute, FaHandPaper, FaInfoCircle } from 'react-icons/fa';
+import { FaRobot, FaRoute, FaInfoCircle } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import CircularGauge from './CircularGauge';
 import Joystick from './Joystick';
@@ -35,41 +35,21 @@ export default function ControlPanel({ onEmergencyStop, flightMode }: ControlPan
     return () => clearInterval(interval);
   }, []);
 
-  const handleTakeoff = () => {
-    if (confirm('Takeoff will be initiated. Are you sure?')) {
-      // Kalkış işlemi
-    }
-  };
-
-  const handleLand = () => {
-    if (confirm('Landing will be initiated. Are you sure?')) {
-      // İniş işlemi
-    }
-  };
-
-  const handleReturnToHome = () => {
-    if (confirm('Drone will return to home. Are you sure?')) {
-      // Eve dönüş işlemi
-    }
-  };
-
-  const handleEmergencyStopClick = () => {
-    if (confirm('Emergency stop will be triggered. Are you sure?')) {
-      onEmergencyStop?.();
-    }
-  };
 
   const isManual = flightMode === 'manual';
   const isAuto = flightMode === 'auto';
   const isPatrol = flightMode === 'patrol';
 
   return (
-    <div className="h-full flex flex-col bg-[#0A0A0A] overflow-auto">
+    <div className="h-full flex flex-col bg-white/40 backdrop-blur-xl rounded-xl border border-white/70 shadow-2xl overflow-auto" style={{ 
+      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+      backdropFilter: 'blur(12px) saturate(180%)',
+    }}>
       {/* Üst: Kontroller */}
       <div className="flex-1 flex items-center justify-center p-3 gap-6">
         {/* Sol: Hareket Joystick */}
         <div className="flex flex-col items-center gap-2 relative">
-          <h3 className="text-[10px] text-gray-400 uppercase tracking-wide">Movement</h3>
+          <h3 className="text-[10px] text-gray-700 uppercase tracking-wide font-medium">Movement</h3>
           <Joystick
             onMove={handleJoystickMove}
             size={144}
@@ -78,8 +58,11 @@ export default function ControlPanel({ onEmergencyStop, flightMode }: ControlPan
           />
           {!isManual && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-black/70 rounded-lg px-3 py-1.5 border border-gray-600">
-                <span className="text-[10px] text-gray-300 font-medium">
+              <div className="bg-white/60 backdrop-blur-xl rounded-lg px-3 py-1.5 border border-white/80 shadow-2xl" style={{ 
+                boxShadow: '0 4px 16px 0 rgba(31, 38, 135, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                backdropFilter: 'blur(12px) saturate(180%)',
+              }}>
+                <span className="text-[10px] text-gray-800 font-medium">
                   {isAuto ? 'AUTO MODE' : 'PATROL MODE'}
                 </span>
               </div>
@@ -94,27 +77,27 @@ export default function ControlPanel({ onEmergencyStop, flightMode }: ControlPan
             min={-30}
             max={30}
             label="Pitch"
-            color={isManual ? "#007BFF" : "#555555"}
+            color={isManual ? "#007BFF" : "#999999"}
           />
           <CircularGauge
             value={roll}
             min={-30}
             max={30}
             label="Roll"
-            color={isManual ? "#28A745" : "#555555"}
+            color={isManual ? "#28A745" : "#999999"}
           />
           <CircularGauge
             value={yaw}
             min={-180}
             max={180}
             label="Yaw"
-            color={isManual ? "#DC3545" : "#555555"}
+            color={isManual ? "#DC3545" : "#999999"}
           />
         </div>
 
         {/* Sağ: Kamera Joystick */}
         <div className="flex flex-col items-center gap-2 relative">
-          <h3 className="text-[10px] text-gray-400 uppercase tracking-wide">Camera</h3>
+          <h3 className="text-[10px] text-gray-700 uppercase tracking-wide font-medium">Camera</h3>
           <Joystick
             onMove={(x, y) => {
               if (isManual) {
@@ -127,8 +110,11 @@ export default function ControlPanel({ onEmergencyStop, flightMode }: ControlPan
           />
           {!isManual && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-black/70 rounded-lg px-3 py-1.5 border border-gray-600">
-                <span className="text-[10px] text-gray-300 font-medium">
+              <div className="bg-white/60 backdrop-blur-xl rounded-lg px-3 py-1.5 border border-white/80 shadow-2xl" style={{ 
+                boxShadow: '0 4px 16px 0 rgba(31, 38, 135, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                backdropFilter: 'blur(12px) saturate(180%)',
+              }}>
+                <span className="text-[10px] text-gray-800 font-medium">
                   {isAuto ? 'AUTO MODE' : 'PATROL MODE'}
                 </span>
               </div>
@@ -139,20 +125,23 @@ export default function ControlPanel({ onEmergencyStop, flightMode }: ControlPan
 
       {/* Mod Bilgilendirme Mesajı */}
       {!isManual && (
-        <div className={`px-4 py-2 mx-4 mb-2 rounded-lg border ${
+        <div className={`px-4 py-2 mx-4 mb-2 rounded-lg border backdrop-blur-lg ${
           isAuto 
-            ? 'bg-green-500/10 border-green-500/30' 
-            : 'bg-orange-500/10 border-orange-500/30'
-        }`}>
+            ? 'bg-green-500/40 border-green-500/70' 
+            : 'bg-orange-500/40 border-orange-500/70'
+        } shadow-2xl`} style={{ 
+          boxShadow: '0 4px 16px 0 rgba(31, 38, 135, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+          backdropFilter: 'blur(10px) saturate(180%)',
+        }}>
           <div className="flex items-center gap-2">
             {isAuto ? (
-              <FaRobot className={`text-sm ${isAuto ? 'text-green-400' : 'text-orange-400'}`} />
+              <FaRobot className={`text-sm ${isAuto ? 'text-green-700' : 'text-orange-700'}`} />
             ) : (
-              <FaRoute className="text-sm text-orange-400" />
+              <FaRoute className="text-sm text-orange-700" />
             )}
             <div className="flex-1">
               <p className={`text-[10px] font-medium ${
-                isAuto ? 'text-green-300' : 'text-orange-300'
+                isAuto ? 'text-green-800' : 'text-orange-800'
               }`}>
                 {isAuto 
                   ? 'Otomatik Uçuş Modu Aktif - Drone otomatik olarak kontrol ediliyor'
@@ -160,49 +149,11 @@ export default function ControlPanel({ onEmergencyStop, flightMode }: ControlPan
                 }
               </p>
             </div>
-            <FaInfoCircle className={`text-xs ${isAuto ? 'text-green-400' : 'text-orange-400'}`} />
+            <FaInfoCircle className={`text-xs ${isAuto ? 'text-green-700' : 'text-orange-700'}`} />
           </div>
         </div>
       )}
 
-      {/* Alt: Hızlı Eylem Butonları */}
-      <div className=" p-4 flex items-center justify-center gap-4">
-        <Button
-          onClick={handleTakeoff}
-          className="rounded-full w-14 h-14 bg-transparent hover:bg-white/10 border border-[#1A1A1A] text-white mb-[20px]"
-          size="icon"
-          title="Takeoff"
-        >
-          <FaArrowUp className="text-lg" />
-        </Button>
-
-        <Button
-          onClick={handleLand}
-          className="rounded-full w-14 h-14 bg-transparent hover:bg-white/10 border border-[#1A1A1A] text-white"
-          size="icon"
-          title="Land"
-        >
-          <FaArrowDown className="text-lg" />
-        </Button>
-
-        <Button
-          onClick={handleReturnToHome}
-          className="rounded-full w-14 h-14 bg-transparent hover:bg-white/10 border border-[#1A1A1A] text-white"
-          size="icon"
-          title="Return to Home"
-        >
-          <FaHome className="text-lg" />
-        </Button>
-
-        <Button
-          onClick={handleEmergencyStopClick}
-          className="rounded-full w-14 h-14 bg-transparent hover:bg-white/10 border border-[#1A1A1A] text-white mb-[20px]"
-          size="icon"
-          title="Emergency Stop"
-        >
-          <FaExclamationTriangle className="text-lg" />
-        </Button>
-      </div>
     </div>
   );
 }

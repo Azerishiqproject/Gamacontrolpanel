@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 
 export default function Home() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [batteryLevel, setBatteryLevel] = useState(75);
   const [signalStrength, setSignalStrength] = useState(80);
@@ -86,24 +87,43 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden bg-[#0A0A0A]">
+    <div 
+      className="h-screen w-screen flex flex-col overflow-hidden relative"
+      style={{
+        backgroundImage: 'url(/bg_image.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      {/* Overlay for better glassmorphism visibility */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.15) 75%, rgba(255, 255, 255, 0.15) 100%)',
+          backdropFilter: 'blur(0.5px)',
+        }}
+      />
       {/* Bağlantı Uyarısı */}
       {!isConnected && (
-        <div className="bg-red-600 text-white text-center py-2 px-4 flex items-center justify-center gap-2">
+        <div className="relative z-10 bg-red-500/90 backdrop-blur-md text-white text-center py-2 px-4 flex items-center justify-center gap-2 shadow-lg">
           <span className="font-bold">⚠ CONNECTION LOST - ALL CONTROLS DISABLED</span>
         </div>
       )}
 
       {/* Header - Sabit üst bar */}
-      <Header 
+      <div className="relative z-10">
+        <Header 
         isConnected={isConnected}
         batteryLevel={batteryLevel}
         signalStrength={signalStrength}
         onEmergencyStop={handleEmergencyStop}
-      />
+        />
+      </div>
 
       {/* Ana içerik alanı - Grid Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="relative z-10 flex-1 flex overflow-hidden">
         {/* Sidebar - Sol panel */}
         <Sidebar 
           isCollapsed={isSidebarCollapsed}
@@ -121,7 +141,12 @@ export default function Home() {
         />
 
         {/* Right Panel - Sağ panel */}
-        {isRightPanelVisible && <RightPanel />}
+        {isRightPanelVisible && (
+          <RightPanel 
+            isCollapsed={isRightPanelCollapsed}
+            onToggleCollapse={() => setIsRightPanelCollapsed(!isRightPanelCollapsed)}
+          />
+        )}
       </div>
     </div>
   );

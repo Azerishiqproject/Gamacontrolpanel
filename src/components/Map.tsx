@@ -1,100 +1,61 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-
 interface MapProps {
   waypoints: Array<{ id: number; lat: number; lng: number; label: string }>;
+  interactive?: boolean; // Haritanın etkileşimli olup olmayacağını belirler
+  hideOverlays?: boolean; // Overlay'leri gizle (küçük harita için)
 }
 
-export default function Map({ waypoints }: MapProps) {
-  const mapRef = useRef<any>(null);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const markersRef = useRef<any[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+export default function Map({ waypoints, interactive = false, hideOverlays = false }: MapProps) {
+  // İlk waypoint'in koordinatlarını al veya varsayılan koordinatları kullan
+  const firstWaypoint = waypoints.length > 0 ? waypoints[0] : null;
+  const lat = firstWaypoint ? firstWaypoint.lat : 41.0122;
+  const lng = firstWaypoint ? firstWaypoint.lng : 28.9743;
+  
+  // Google Maps Embed URL oluştur - Basit format (API key gerektirmez)
+  // UI kontrollerini ve yazıları gizlemek için parametreler ekliyoruz
+  const embedUrl = `https://www.google.com/maps?q=${lat},${lng}&output=embed&hl=tr&t=m&z=14`;
 
-  useEffect(() => {
-    if (typeof window === 'undefined' || !mapContainerRef.current || mapRef.current) return;
-
-    const loadMap = async () => {
-      const L = await import('leaflet');
-      // CSS dinamik olarak yükleniyor
-      if (typeof document !== 'undefined') {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        document.head.appendChild(link);
-      }
-
-      // Marker ikon sorununu düzelt
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-      });
-
-      // Leaflet haritasını oluştur
-      const map = L.map(mapContainerRef.current!, {
-        center: [41.0122, 28.9743],
-        zoom: 13,
-        zoomControl: false,
-        attributionControl: false,
-      });
-
-      // Esri World Imagery - Satellite style (free, no API key needed)
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: '© Esri',
-        maxZoom: 19,
-      }).addTo(map);
-
-      mapRef.current = { map, L };
-      setIsLoaded(true);
-    };
-
-    loadMap();
-
-    return () => {
-      if (mapRef.current?.map) {
-        mapRef.current.map.remove();
-        mapRef.current = null;
-      }
-    };
-  }, []);
-
-  // Waypoint'leri haritada güncelle
-  useEffect(() => {
-    if (!isLoaded || !mapRef.current) return;
-
-    const { map, L } = mapRef.current;
-
-    // Eski marker'ları temizle
-    markersRef.current.forEach((marker) => marker.remove());
-    markersRef.current = [];
-
-    // Yeni marker'ları ekle - daha belirgin marker
-    waypoints.forEach((wp) => {
-      const marker = L.marker([wp.lat, wp.lng], {
-        icon: L.divIcon({
-          className: 'custom-marker',
-          html: `<div style="background-color: #007BFF; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,123,255,0.6);"></div>`,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
-        }),
-      }).addTo(map);
-
-      // Haritayı marker'a odakla
-      map.setView([wp.lat, wp.lng], 14);
-      
-      marker.bindPopup(wp.label);
-      markersRef.current.push(marker);
-    });
-  }, [waypoints, isLoaded]);
 
   return (
-    <div
-      ref={mapContainerRef}
-      className="w-full h-full rounded-lg overflow-hidden bg-[#1a1a1a]"
-    />
+    <div className="w-full h-full rounded-lg overflow-hidden relative" style={{ backgroundColor: '#e5e7eb' }}>
+      {/* Üstteki yazıları ve logoları gizlemek için overlay - sadece büyük harita için */}
+      {!hideOverlays && (
+        <>
+          <div 
+            className="absolute top-0 left-0 right-0 z-20 pointer-events-none"
+            style={{ 
+              height: '80px',
+              background: 'linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0) 100%)'
+            }}
+          />
+          {/* Alttaki yazıları gizlemek için overlay */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
+            style={{ 
+              height: '60px',
+              background: 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0) 100%)'
+            }}
+          />
+        </>
+      )}
+      <iframe
+        src={embedUrl}
+        width="100%"
+        height="100%"
+        style={{ 
+          border: 0, 
+          pointerEvents: interactive ? 'auto' : 'none',
+          marginTop: hideOverlays ? '0' : '-80px',
+          marginBottom: hideOverlays ? '0' : '-60px',
+          height: hideOverlays ? '100%' : 'calc(100% + 140px)'
+        }}
+        allowFullScreen
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        className="w-full"
+      />
+    </div>
   );
 }
 
